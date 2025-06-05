@@ -30,14 +30,14 @@ smogon["moves"] = smogon["moves"].apply(lambda columna: ' '.join(re.findall(patt
 
 #Se realiza TD-IDF con las stopwords de NLTK solo para unigramas
 vec = TfidfVectorizer(stop_words=stopwords.words("english"))
-clasificacion = vec.fit_transform(raw_documents=smogon["moves"])
+agrupamiento = vec.fit_transform(raw_documents=smogon["moves"])
 tokens = vec.vocabulary_.keys()
 
 #Imprime los tokenes y el número total de estos
 print(f"Tokens: {tokens}\nNúmero de tokens: {len(tokens)}")
 
 #A partir del agrupamiento del TF-IDF (Pasado a un array) se genera un DataFrame nuevo
-smogon_agrupado = pd.DataFrame(data=clasificacion.toarray(),columns=sorted(tokens))
+smogon_agrupado = pd.DataFrame(data=agrupamiento.toarray(),columns=sorted(tokens))
 
 #Se prepara un KMeans de 21 clusters
 km = KMeans(n_clusters=21, n_init=100)
@@ -60,6 +60,9 @@ smogon_agrupado["Type2"] = lista_tipos_sec
 
 #Agrega los clusters designados a cada Pokemon
 smogon_agrupado["Cluster"] = lista
+
+#Se crea el archivo .csv a partir del nuevo DataFrame
+smogon_agrupado.to_csv("smogon_agrupado_vocabulario.csv")
 
 #Imprime el DataFrame para analizarlo
 print(smogon_agrupado)
