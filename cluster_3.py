@@ -26,8 +26,8 @@ data = pd.read_csv("smogon_agrupado_1.csv")
 data.drop(data[["Type1","Type2","Cluster"]],axis="columns",inplace=True)
 print(data)
 
-#Se retira el doble índice
-data.drop(data.columns[[0]],axis="columns",inplace=True)
+#Se retira el doble índice y nombres
+data.drop(data.columns[[0,1]],axis="columns",inplace=True)
 print(data)
 
 #Se asigna un 70% de varianza deseada a los componentes
@@ -55,18 +55,19 @@ print(data_pca)
 
 #Se realiza KMeans a la matriz x_pca
 km = KMeans(n_clusters=21, n_init=20)
-lista = km.fit_predict(x_pca)
+clusters = km.fit_predict(x_pca)
 
 #Se sacan lista de tipos primarios y secundarios a partir de una función relacionada con el .json
 lista_tipos,lista_tipos_sec = file_to_json.retornar_tipos(pkm_nombres,tipos_json) #Más información en file_to_json.py
 
+#Se agregan los tipos al DataFrame para facilitar el analisis al usar print
+data_pca["Type1"] = lista_tipos
+data_pca["Type2"] = lista_tipos_sec
+
 #Agrega los clusters designados a cada Pokemon al DataFrame con el PCA
-data_pca["Cluster"] = lista
+data_pca["Cluster"] = clusters
 
 #Se crea el archivo .csv a partir del nuevo DataFrame
 data_pca.to_csv("smogon_agrupado_PCA.csv")
 
-#Se agregan los tipos al DataFrame para facilitar el analisis al usar print
-data_pca["Type1"] = lista_tipos
-data_pca["Type2"] = lista_tipos_sec
 print(data_pca)
